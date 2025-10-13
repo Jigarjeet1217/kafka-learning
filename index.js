@@ -12,6 +12,9 @@ function setUpServer(env) {
       override: true,
     });
   }
+  // read from config and push into process.env
+  const { topics } = require('./config/config');
+  process.env.topics = topics;
 }
 
 setUpServer('local');
