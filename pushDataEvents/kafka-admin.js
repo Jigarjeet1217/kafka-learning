@@ -11,7 +11,7 @@ async function createTopics() {
     let topicsToCreate = [];
     for (let topic of topics) {
       let topicConfig = {
-        topic, // name of topic
+        topic: topic + '_' + process.env.clientId, // name of topic
         numPartitions: 3, // number of partitions a topic shoul have
         replicationFactor: 1,
       };
@@ -33,6 +33,7 @@ async function listTopics() {
   try {
     // await admin.connect();
     let topics = await admin.listTopics();
+    global.topics = topics;
     console.log('created topics : ', topics);
   } catch (error) {
     console.log('error in fetching topics!!!', error);

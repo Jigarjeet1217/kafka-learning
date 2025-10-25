@@ -1,3 +1,3 @@
 module.exports = {
-  topics: ['dev1', 'dev2', 'dev3', 'dev4', 'dev5', 'dev6'],
+  topics: ['node', 'react', 'kafka', 'express'],
 };

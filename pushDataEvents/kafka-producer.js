@@ -49,11 +49,19 @@ createProducer()
     })
   );
 
+function getRandomTopic(topics) {
+  let random = Math.floor(Math.random() + topics.length);
+  return topics[random];
+}
+
 async function sendMessage() {
   try {
+    let existingTopics = global.topics;
+    let topic = getRandomTopic(existingTopics);
+
     let key = Date.now().toString();
     await producer.send({
-      topic: 'Random' + process.env.clientId,
+      topic,
       messages: [
         {
           key,
