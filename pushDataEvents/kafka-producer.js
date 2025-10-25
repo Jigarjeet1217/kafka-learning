@@ -1,6 +1,17 @@
 const kafka = require('./kafka-client');
 
-let producer = kafka.producer();
+let producer = kafka.producer({
+  // default = true to allow auto topics creation,
+  // if false dont allow auto topic creation error on new topic creation - This server does not host this topic-partition
+  allowAutoTopicCreation: true,
+  retry: {
+    maxRetryTime: 20000, // how long to continue retry mechanism
+    initialRetryTime: 100, // start retry after what time in ms
+    retries: 8, // max number of retries - max value = 8
+  },
+  metadataMaxAge: 10000, // max time in ms to keep data or messages for
+  // maxInFlightRequests: 5, // max number of requests that can be in progress at a time
+});
 
 // async function main() {
 //   try {
@@ -54,5 +65,18 @@ async function sendMessage() {
     console.log('Error in sending message : ', error);
   }
 }
+
+// error handling in producer life cycle
+producer.on(producer.events.CONNECT, (msg) => {
+  console.log('Producer connection success', msg);
+});
+
+producer.on(producer.events.DISCONNECT, (msg) => {
+  console.log('Producer disconnect ', msg);
+});
+
+// producer.on(producer.events.REQUEST, (msg) => {
+//   console.log('Producer Request ', msg);
+// });
 
 module.exports = { sendMessage };
