@@ -1,5 +1,6 @@
 const kafka = require('./kafka-client');
 let msgKeys = ['admin', 'superadmin', 'user'];
+const { CompressionTypes } = require('kafkajs');
 
 let producer = kafka.producer({
   // default = true to allow auto topics creation,
@@ -68,6 +69,15 @@ function getDynamicKeys() {
  * 4. when both key and partition are defined, partition will take preference
  */
 
+// handling other parameters while sending message
+// 1. Compression types (Shrinks message size, saves network bandwidth, reducing storage usage)
+// 1.1 compressionType = None (default, no shrink or size reduction)
+// 1.2 compressionType = Gzip (highest compression ratio -> smallest message sizes and lowest network bandwidth usage, require high CPU usage, slow compression and decompression speed)
+// 1.3 compressionType = Snappy (moderate compression ratio and moderate CPU usage)
+// 1.4 compressionType = LZ4 (lowest compression ratio and lowest CPU usage, fastest compression speed)
+// 1.5 compressionType = ZSTD (high compression ratio, better than GZIP, with moderate CPU usage, fast compression and decompression speed, preferred choice )
+
+let compression = CompressionTypes.None;
 async function sendMessage() {
   try {
     let existingTopics = global.topics;
@@ -79,10 +89,15 @@ async function sendMessage() {
       messages: [
         {
           key,
-          value: `Current time in ms: ${key}`,
+          value: JSON.stringify({
+            producedTo: key,
+            value: 'Data written',
+          }),
           // partition: 0,
         },
       ],
+      acks: -1, // possible values -1 or All, 0 no acks and 1 wait for leader partition to commit
+      compression,
     });
   } catch (error) {
     console.log('Error in sending message : ', error);
