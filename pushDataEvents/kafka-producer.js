@@ -77,6 +77,10 @@ function getDynamicKeys() {
 // 1.4 compressionType = LZ4 (lowest compression ratio and lowest CPU usage, fastest compression speed)
 // 1.5 compressionType = ZSTD (high compression ratio, better than GZIP, with moderate CPU usage, fast compression and decompression speed, preferred choice )
 
+// kafkajs provides 3 types of message values and key - Buffer | String | null
+// common serializing in kafka js includes - string including json, int and float, avro and protobuff
+// default serializing is string for which no serializing is needed
+
 let compression = CompressionTypes.None;
 async function sendMessage() {
   try {
