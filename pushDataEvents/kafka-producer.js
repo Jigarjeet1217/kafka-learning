@@ -94,6 +94,7 @@ async function sendMessage() {
             value: 'Data written',
           }),
           // partition: 0,
+          // timestamp: Date.now().toString(), if no timestamp, kafka gives default ms string
         },
       ],
       acks: -1, // possible values -1 or All, 0 no acks and 1 wait for leader partition to commit
