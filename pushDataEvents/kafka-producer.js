@@ -1,4 +1,5 @@
 const kafka = require('./kafka-client');
+let msgKeys = ['admin', 'superadmin', 'user'];
 
 let producer = kafka.producer({
   // default = true to allow auto topics creation,
@@ -50,22 +51,36 @@ createProducer()
   );
 
 function getRandomTopic(topics) {
-  let random = Math.floor(Math.random() + topics.length);
+  let random = Math.floor(Math.random() * topics.length);
   return topics[random];
 }
+
+function getDynamicKeys() {
+  let random = Math.floor(Math.random() * msgKeys.length);
+  return msgKeys[random];
+}
+
+/**
+ * @description producing with key as null and no partition on message obj
+ * 1. when producing successive message with key = null (and partition = null on msg obj) for same topic, partitions are assigned in roundrobin approach
+ * 2. when key is provided on msg (and partition = null) then messages with same key for a topic will go to same partition
+ * 3. when key = null and partition have some value, data go into mentioned partition
+ * 4. when both key and partition are defined, partition will take preference
+ */
 
 async function sendMessage() {
   try {
     let existingTopics = global.topics;
-    let topic = getRandomTopic(existingTopics);
+    let topic = getRandomTopic(existingTopics),
+      key = getDynamicKeys();
 
-    let key = Date.now().toString();
     await producer.send({
       topic,
       messages: [
         {
           key,
           value: `Current time in ms: ${key}`,
+          // partition: 0,
         },
       ],
     });
