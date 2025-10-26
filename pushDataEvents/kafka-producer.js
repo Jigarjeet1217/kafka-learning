@@ -61,18 +61,25 @@ function getDynamicKeys() {
   return msgKeys[random];
 }
 
-function getSerializedMessage() {
+function getDynamicTypeValue() {
   //  string -> sent directly -> no stringify/serializing needed (if send with json.stringify quotes will appear so parsing is needed at consumer end)
   //  object/array -> cant sent directly -> json stringify needed (parsing at consumer needed)
   //  Buffer -> sent directly -> serializing needed as buffer only
   //  Avro/Protobuf -> cant sent directly -> Custom serializer as buffer only (parsing at consumer needed)
 
-  // let value = Buffer.from('storing as a buffer');
-  // let value = 123;
-  // let value = 'string type value';
-  // let value = 'string type value';
-  // let value = { id: 1, name: 'kafkajs' };
-  let value = [{ id: 1, name: 'kafkajs' }];
+  let valuesArray = [
+    `Current time in ms is ${Date.now()}`,
+    122528,
+    { id: Date.now(), name: 'Gurniwaz Singh Sandhu' },
+    Buffer.from('I am a buffer value'),
+    [1, 2, 3, 4, 5, 6],
+  ];
+
+  let value = Math.floor(Math.random() * valuesArray.length);
+  return valuesArray[value];
+}
+function getSerializedMessage() {
+  let value = getDynamicTypeValue();
   let isBuffer = Buffer.isBuffer(value); // explicitly checking as buffer is also of type object
 
   let valueType = isBuffer ? 'buffer' : typeof value;
