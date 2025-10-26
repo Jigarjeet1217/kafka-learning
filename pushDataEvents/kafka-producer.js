@@ -61,6 +61,39 @@ function getDynamicKeys() {
   return msgKeys[random];
 }
 
+function getSerializedMessage() {
+  //  string -> sent directly -> no stringify/serializing needed (if send with json.stringify quotes will appear so parsing is needed at consumer end)
+  //  object/array -> cant sent directly -> json stringify needed (parsing at consumer needed)
+  //  Buffer -> sent directly -> serializing needed as buffer only
+  //  Avro/Protobuf -> cant sent directly -> Custom serializer as buffer only (parsing at consumer needed)
+
+  // let value = Buffer.from('storing as a buffer');
+  // let value = 123;
+  // let value = 'string type value';
+  // let value = 'string type value';
+  // let value = { id: 1, name: 'kafkajs' };
+  let value = [{ id: 1, name: 'kafkajs' }];
+  let isBuffer = Buffer.isBuffer(value); // explicitly checking as buffer is also of type object
+
+  let valueType = isBuffer ? 'buffer' : typeof value;
+  switch (valueType) {
+    case 'string':
+    case 'buffer':
+      value = value;
+      break;
+    case 'number':
+      value = value.toString();
+      break;
+    case 'object':
+      value = JSON.stringify(value);
+      break;
+    default:
+      value = value;
+  }
+
+  return value;
+}
+
 /**
  * @description producing with key as null and no partition on message obj
  * 1. when producing successive message with key = null (and partition = null on msg obj) for same topic, partitions are assigned in roundrobin approach
@@ -93,10 +126,7 @@ async function sendMessage() {
       messages: [
         {
           key,
-          value: JSON.stringify({
-            producedTo: key,
-            value: 'Data written',
-          }),
+          value: getSerializedMessage(),
           // partition: 0,
           // timestamp: Date.now().toString(), if no timestamp, kafka gives default ms string
         },
