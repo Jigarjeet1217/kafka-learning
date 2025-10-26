@@ -129,9 +129,9 @@ async function sendMessage() {
           value: getSerializedMessage(),
           // partition: 0,
           // timestamp: Date.now().toString(), if no timestamp, kafka gives default ms string
-          headers: {
-            type: 'plain/text',
-          },
+          // headers: {
+          //   type: 'plain/text',
+          // },
         },
       ],
       acks: -1, // possible values -1 or All, 0 no acks and 1 wait for leader partition to commit
